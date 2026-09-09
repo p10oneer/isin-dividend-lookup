@@ -112,7 +112,6 @@ def main() -> None:
         st.markdown(
             """
 <div class="bcc-guide" style="color:#21252B;">
-<p><strong>Кому это нужно.</strong> Сотруднику бэк-офиса: из файла с ISIN получить последние дивиденды, без ручного поиска по терминалам.</p>
 <p><strong>Что подготовить.</strong> Excel: первый лист, первый столбец — коды <strong>ISIN</strong>. Заголовок <code>ISIN</code> пропускается. Другие столбцы игнорируются.</p>
 <ol>
 <li><strong>Слева</strong> загрузите файл или вставьте ISIN (по одному в строке).</li>
@@ -120,7 +119,6 @@ def main() -> None:
 <li>Дождитесь таблицы. Фильтр: Все / OK / Проблемы.</li>
 <li>Скачайте <strong>Excel</strong> или <strong>CSV</strong>. Имя файла содержит дату и время, предыдущая копия не затрётся.</li>
 </ol>
-<p><strong>Откуда данные.</strong> OpenFIGI (сопоставление ISIN), Yahoo Finance и Nasdaq. Это не замена Bloomberg / Refinitiv.</p>
 <p><strong>Колонки в таблице</strong> (отраслевые названия на английском): <strong>ISIN</strong>, <strong>Ticker</strong>, <strong>Dividend</strong>, <strong>Currency</strong>, <strong>Ex-date</strong>, <strong>Pay-date</strong>, <strong>Status</strong>.</p>
 <p><strong>Status</strong></p>
 <div class="bcc-legend">
