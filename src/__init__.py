@@ -1,0 +1,1 @@
+"""ISIN dividend lookup helpers."""
