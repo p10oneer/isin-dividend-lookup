@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import os
 from datetime import datetime
 from pathlib import Path
@@ -10,7 +11,6 @@ import pandas as pd
 import streamlit as st
 
 from src.excel_io import (
-    DISCLAIMER,
     parse_isins_from_excel,
     parse_isins_from_text,
     result_csv_bytes,
@@ -29,6 +29,52 @@ CSS = ROOT / "assets" / "brand" / "app.css"
 
 FOREST = "#0B534F"
 LARGE_BATCH = 150
+
+TABLE_COLUMNS = [
+    ("ISIN", "ISIN"),
+    ("Name", "Название"),
+    ("Yahoo ticker", "Ticker"),
+    ("Dividend", "Dividend"),
+    ("Currency", "Currency"),
+    ("Ex-date", "Ex-date"),
+    ("Pay-date", "Pay-date"),
+    ("Source", "Source"),
+    ("Status", "Status"),
+    ("Lookup time", "Время запроса"),
+]
+
+
+def _row_class(status: str) -> str:
+    if status.startswith("OK"):
+        return "row-ok"
+    if status.startswith("No dividend history"):
+        return "row-nodiv"
+    return "row-problem"
+
+
+def _cell_text(value: object, column: str) -> str:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    if column == "Dividend" and isinstance(value, (int, float)):
+        return f"{value:g}"
+    return str(value)
+
+
+def render_status_table(df: pd.DataFrame) -> str:
+    head = "".join(f"<th>{html.escape(label)}</th>" for _, label in TABLE_COLUMNS)
+    body_rows = []
+    for _, row in df.iterrows():
+        status = str(row.get("Status") or "")
+        row_class = _row_class(status)
+        cells = "".join(
+            f"<td>{html.escape(_cell_text(row.get(col), col))}</td>" for col, _ in TABLE_COLUMNS
+        )
+        body_rows.append(f'<tr class="{row_class}">{cells}</tr>')
+    return (
+        '<div class="bcc-table-wrap"><table class="bcc-table">'
+        f"<thead><tr>{head}</tr></thead><tbody>{''.join(body_rows)}</tbody>"
+        "</table></div>"
+    )
 
 
 def _inject_css() -> None:
@@ -174,7 +220,6 @@ def main() -> None:
             """,
             unsafe_allow_html=True,
         )
-        st.markdown(f'<p class="bcc-disclaimer">{DISCLAIMER}</p>', unsafe_allow_html=True)
         return
 
     if len(isins) > LARGE_BATCH:
@@ -212,7 +257,6 @@ def main() -> None:
     df: pd.DataFrame | None = st.session_state.results
     if df is None:
         st.info(f"Загружено ISIN: {len(isins)} ({source_label}). Нажмите «Найти дивиденды» слева.")
-        st.markdown(f'<p class="bcc-disclaimer">{DISCLAIMER}</p>', unsafe_allow_html=True)
         return
 
     stats = summarize(df)
@@ -230,19 +274,7 @@ def main() -> None:
     elif filter_choice == "Проблемы":
         view = df[~status.str.startswith("OK")]
 
-    column_config = {
-        "ISIN": st.column_config.TextColumn("ISIN", help="International Securities Identification Number"),
-        "Name": st.column_config.TextColumn("Название"),
-        "Yahoo ticker": st.column_config.TextColumn("Ticker"),
-        "Dividend": st.column_config.NumberColumn("Dividend", help="Последний cash dividend per share"),
-        "Currency": st.column_config.TextColumn("Currency"),
-        "Ex-date": st.column_config.TextColumn("Ex-date", help="Дата отсечки / ex-dividend date"),
-        "Pay-date": st.column_config.TextColumn("Pay-date", help="Дата выплаты / payment date"),
-        "Source": st.column_config.TextColumn("Source"),
-        "Status": st.column_config.TextColumn("Status"),
-        "Lookup time": st.column_config.TextColumn("Время запроса"),
-    }
-    st.dataframe(view, width="stretch", hide_index=True, column_config=column_config)
+    st.markdown(render_status_table(view), unsafe_allow_html=True)
 
     stamp = timestamped_basename(datetime.now())
     xlsx = result_excel_bytes(df)
@@ -267,8 +299,6 @@ def main() -> None:
             key=f"csv_{stamp}",
             use_container_width=True,
         )
-
-    st.markdown(f'<p class="bcc-disclaimer">{DISCLAIMER}</p>', unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

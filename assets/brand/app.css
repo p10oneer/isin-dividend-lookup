@@ -231,6 +231,47 @@ div[data-testid="stRadio"] p {
   color: #21252B;
 }
 
+.bcc-table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #E1E4E8;
+  border-radius: 12px;
+}
+table.bcc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+table.bcc-table thead th {
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 0.6rem 0.85rem;
+  background: #F4F5F6;
+  color: #545D6D;
+  font-weight: 600;
+  border-bottom: 1px solid #E1E4E8;
+  white-space: nowrap;
+}
+table.bcc-table tbody td {
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid #EEF1F4;
+  color: #21252B;
+  white-space: nowrap;
+}
+table.bcc-table tbody tr:last-child td {
+  border-bottom: none;
+}
+table.bcc-table tr.row-ok td {
+  background: #E3F3EC;
+}
+table.bcc-table tr.row-nodiv td {
+  background: #FDEFC7;
+}
+table.bcc-table tr.row-problem td {
+  background: #FBDCD6;
+}
+
 .bcc-empty {
   background: #fff;
   border: 1px solid #E1E4E8;
@@ -241,12 +282,6 @@ div[data-testid="stRadio"] p {
 }
 .bcc-empty p {
   color: #545D6D !important;
-}
-.bcc-disclaimer {
-  color: #545D6D !important;
-  font-size: 0.92rem;
-  line-height: 1.45;
-  margin-top: 1.75rem;
 }
 
 section[data-testid="stExpander"] {
